@@ -1,6 +1,7 @@
 #include "WifiCam.hpp"
 #include <StreamString.h>
 #include <uri/UriBraces.h>
+#include <SD.h>
 
 #define width 640
 #define height 480
@@ -19,8 +20,30 @@ static void serveStill()
 
     server.setContentLength(frame->size());
     server.send(200, "image/jpeg");
+
     WiFiClient client = server.client();
     frame->writeTo(client);
+
+    // open the file. note that only one file can be open at a time,
+    // so you have to close this one before opening another.
+    File dataFile = SD.open("image.jpeg");
+
+    // if the file is available, write to it:
+    if (dataFile)
+    {
+        dataFile.write(frame->data(), frame->size());
+        // while (dataFile.available())
+        // {
+        //     Serial.write(dataFile.read());
+        // }
+        dataFile.close();
+        Serial.println("Saved to SD card!");
+    }
+    // if the file isn't open, pop up an error:
+    else
+    {
+        Serial.println("error opening datalog.txt");
+    }
 }
 
 static void serveMjpeg()
@@ -39,10 +62,10 @@ void addRequestHandlers()
 
     if (!esp32cam::Camera.changeResolution(r))
     {
-        Serial.printf("changeResolution(%ld,%ld) failure\n", width, height);
+        Serial.printf("changeResolution(%d,%d) failure\n", width, height);
         server.send(500, "text/plain", "changeResolution error\n");
     }
-    Serial.printf("changeResolution(%ld,%ld) success\n", width, height);
+    Serial.printf("changeResolution(%d,%d) success\n", width, height);
     server.on("/", HTTP_GET, []
               { serveMjpeg(); });
 

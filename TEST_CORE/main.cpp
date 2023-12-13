@@ -1,5 +1,7 @@
+// TEST_CORE
 #include <Arduino.h>
-#include <configs/esp32_one_config.h>
+#include <FastLED.h>
+#include <configs/esp32board.h>
 
 void print_task(void *param)
 {
@@ -12,18 +14,18 @@ void print_task(void *param)
     }
 }
 
+CRGB leds[1];
 void flash_task(void *param)
 {
+    FastLED.addLeds<NEOPIXEL, BLINK_LED>(leds, 1); // GRB ordering is assumed
     for (;;)
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 0xffffff; i += 100)
         {
-            digitalWrite(BLINK_LED, 0);
-            vTaskDelay(200 / portTICK_PERIOD_MS);
-            digitalWrite(BLINK_LED, 1);
-            vTaskDelay(200 / portTICK_PERIOD_MS);
+            leds[0] = i;
+            FastLED.show();
+            vTaskDelay(10 / portTICK_PERIOD_MS);
         }
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 }
 
@@ -45,7 +47,7 @@ void setup()
     xTaskCreatePinnedToCore(
         flash_task,
         "FLASHING",
-        1024,
+        4096,
         NULL,
         10,
         NULL,

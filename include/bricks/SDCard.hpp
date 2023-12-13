@@ -2,7 +2,7 @@
 
 #include <SD.h>
 #include <SPI.h>
-#include <configs/esp32_one_config.h>
+#include <configs/esp32board.h>
 
 SPIClass hspi(HSPI);
 

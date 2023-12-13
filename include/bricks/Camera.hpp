@@ -10,7 +10,7 @@
 #include <StreamString.h>
 #include <uri/UriBraces.h>
 #include <esp32cam.h>
-#include <configs/esp32_one_config.h>
+#include <configs/esp32board.h>
 
 #define width 640
 #define height 480

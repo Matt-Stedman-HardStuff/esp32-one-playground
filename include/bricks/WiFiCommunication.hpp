@@ -6,8 +6,10 @@
 
 namespace WiFiCommunication
 {
+    int port = 80;
     WebServer server(80);
-
+    WiFiClient client;
+    
     void initalizeWifi()
     {
         WiFi.persistent(false);
@@ -24,5 +26,9 @@ namespace WiFiCommunication
 
         Serial.print("http://");
         Serial.println(WiFi.localIP());
+    }
+
+    bool checkAvailable() {
+        client = server.available()
     }
 }
